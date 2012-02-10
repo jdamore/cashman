@@ -1,0 +1,47 @@
+
+/** Text fonts and sizes definitions */
+.title {
+	color: black;
+	font-family: Arial;
+	font-weight : bold;
+	font-size: 24px;
+	text-align: left;
+}
+.bigtext {
+	font-size: 9pt;
+	font-family: Verdana;
+	color: #777777;
+}
+.regtext {
+	font-size: 8pt;
+	font-family: Verdana;
+	color: #777777;
+}
+.smalltext {
+	font-size: 7pt;
+	font-family: Verdana;
+	color: #777777;
+}
+
+/** Styles for buttons */
+.button
+{
+    width: 100px;
+    height: 20px;
+    border: 0px solid #002277;
+    font-size: 11px;
+    color: #ffffff;
+    font-weight: normal;
+    font-family: Verdana;
+    background-color: #006699;
+    text-decoration: none;
+}
+
+/** Styles for tables */
+.tableheader {
+    color: #ffffff;
+    background-color: #000099;
+	font-size: 9pt;
+	font-family: Verdana;
+	line-height: 20px;
+}

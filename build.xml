@@ -1,0 +1,439 @@
+<project name="Cashman ANT Build Script" basedir="." default="all">
+
+    <!-- =================================================================== -->
+    <!-- Properties                                                          -->
+    <!-- =================================================================== -->
+    <property file="build.properties"/>
+
+    <!-- =================================================================== -->
+    <!-- Application Classes and Libraries Paths                             -->
+    <!-- =================================================================== -->
+    <path id="cashman.src.path">
+        <path location="${cashman.src}"/>
+    </path>
+
+    <path id="cashman.cls.path">
+        <path location="${cashman.dist}/cashman/WEB-INF/classes"/>
+    </path>
+
+    <path id="cashman.lib.path">
+        <fileset dir="${cashman.lib}">
+            <include name="**/*.jar"/>
+        </fileset>
+    </path>
+
+    <path id="cashman.path">
+        <path location="${cashman.dist}/cashman/WEB-INF/classes"/>
+        <fileset dir="${cashman.lib}">
+            <include name="**/*.jar"/>
+        </fileset>
+    </path>
+
+
+    <!-- =================================================================== -->
+    <!-- reate required distribution directories                             -->
+    <!-- =================================================================== -->
+    <target name="prepare">
+        <mkdir dir="${cashman.dist}/cashman/WEB-INF"/>
+        <mkdir dir="${cashman.dist}/cashman/WEB-INF/classes"/>
+        <!--<mkdir dir="${cashman.dist}/cashman/WEB-INF/classes_test"/>-->
+        <!--<mkdir dir="${cashman.dist}/cashman/WEB-INF/classes_sel"/>-->
+        <mkdir dir="${cashman.dist}/cashman/WEB-INF/lib"/>
+        <mkdir dir="${cashman.dist}/cashman/jsp"/>
+        <mkdir dir="${cashman.dist}/cashman/css"/>
+    </target>
+
+    <!-- =================================================================== -->
+    <!-- Clean Target                                                         -->
+    <!-- =================================================================== -->
+    <target name="clean" description="Clean executable and distribution">
+        <delete file="${cashman.dist}/cashman.war"/>
+        <delete dir="${cashman.dist}/cashman"/>
+        <delete dir="${cashman.doc}"/>
+        <delete dir="${basedir}">
+            <include name="./**/*.emma" />
+        </delete>
+    </target>
+
+    <!-- =================================================================== -->
+    <!-- All Targets                                                        -->
+    <!-- =================================================================== -->
+    <target name="all" description="Default Target">
+        <antcall target="clean" />
+        <antcall target="build" />
+        <antcall target="test" />
+        <antcall target="javadoc" />
+    </target>
+
+    <!-- =================================================================== -->
+    <!-- Build Target                                                         -->
+    <!-- =================================================================== -->
+    <target name="build" description="Main Build Target">
+        <antcall target="prepare" />
+        <antcall target="compile" />
+        <antcall target="instrument" />
+        <antcall target="dist" />
+    </target>
+
+     <!-- =================================================================== -->
+    <!-- Build Target                                                         -->
+    <!-- =================================================================== -->
+    <target name="test" description="Test Build Target">
+        <antcall target="test-unit" />
+        <antcall target="test-selenium" />
+    </target>
+
+    <!-- =================================================================== -->
+    <!-- Dist Target                                                         -->
+    <!-- =================================================================== -->
+    <target name="dist" description="Main Build Target">
+        <antcall target="copy-web-config" />
+        <antcall target="copy-struts-config" />
+        <antcall target="copy-spring-config" />
+        <antcall target="copy-lib" />
+        <antcall target="copy-jsp" />
+        <antcall target="copy-css" />
+        <antcall target="javadoc" />
+        <antcall target="create-war" />
+    </target>
+
+    <!--=================================================================== -->
+    <!--Compile all Java Code                                               -->
+    <!--=================================================================== -->
+    <target name="compile"  depends="prepare">
+        <javac srcdir="${cashman.src}"
+            destdir="${cashman.cls}"
+            debug="on"
+            deprecation="on"
+            optimize="on">
+            <classpath refid="cashman.lib.path"/>
+        </javac>
+    </target>
+
+
+
+    <!-- =================================================================== -->
+    <!-- Copy web.xml to distribution                                        -->
+    <!-- =================================================================== -->
+    <target name="copy-web-config" depends="prepare">
+        <copy toDir="${cashman.dist}/cashman/WEB-INF" flatten="true">
+            <fileset dir="${cashman.src}">
+                <include name="**/web.xml"/>
+            </fileset>
+        </copy>
+    </target>
+
+    <!-- =================================================================== -->
+    <!-- Copy Struts XML config files to distribution                        -->
+    <!-- =================================================================== -->
+    <target name="copy-struts-config" depends="prepare">
+        <copy toDir="${cashman.dist}/cashman/WEB-INF/classes" flatten="true">
+            <fileset dir="${cashman.src}">
+                <include name="**/*struts*.xml"/>
+            </fileset>
+        </copy>
+    </target>
+
+    <!-- =================================================================== -->
+    <!-- Copy Spring config files to distribution                            -->
+    <!-- =================================================================== -->
+    <target name="copy-spring-config" depends="prepare">
+        <copy toDir="${cashman.dist}/cashman/WEB-INF/classes" flatten="true">
+            <fileset dir="${cashman.cfg}">
+                <include name="**/spring-context-*.xml"/>
+            </fileset>
+        </copy>
+    </target>
+
+    <!-- =================================================================== -->
+    <!-- Copy application libraries to distribution                          -->
+    <!-- =================================================================== -->
+    <target name="copy-lib" depends="prepare">
+        <copy toDir="${cashman.dist}/cashman/WEB-INF/lib" flatten="true">
+            <fileset dir="${cashman.lib}">
+                <include name="**/*.jar"/>
+            </fileset>
+        </copy>
+        <copy toDir="${cashman.dist}/cashman/WEB-INF/lib/tld" flatten="true">
+            <fileset dir="${cashman.lib}">
+                <include name="**/*.tld"/>
+            </fileset>
+        </copy>
+    </target>
+
+    <!-- =================================================================== -->
+    <!-- Copy JSPs to distribution                                           -->
+    <!-- =================================================================== -->
+    <target name="copy-jsp" depends="prepare">
+        <copy toDir="${cashman.dist}/cashman/jsp" flatten="true">
+            <fileset dir="${cashman.src}">
+                <include name="**/*.jsp"/>
+            </fileset>
+        </copy>
+        <copy toDir="${cashman.dist}/cashman" flatten="true">
+            <fileset dir="${cashman.src}">
+                <include name="**/index.jsp"/>
+            </fileset>
+        </copy>
+    </target>
+
+    <!-- =================================================================== -->
+    <!-- Copy CSSs to distribution                                           -->
+    <!-- =================================================================== -->
+    <target name="copy-css" depends="prepare">
+        <copy toDir="${cashman.dist}/cashman/css" flatten="true">
+            <fileset dir="${cashman.src}">
+                <include name="**/*.css"/>
+            </fileset>
+        </copy>
+    </target>
+
+    <!-- =================================================================== -->
+    <!-- Copy JBehave Stories                                                -->
+    <!-- =================================================================== -->
+    <target name="copy-stories" depends="prepare">
+        <copy toDir="${cashman.dist}/cashman/WEB-INF/classes" flatten="false">
+            <fileset dir="${cashman.uitest}">
+                <include name="**/*.story"/>
+            </fileset>
+        </copy>
+    </target>
+
+    <!-- =================================================================== -->
+    <!-- Create cashman.war                                                  -->
+    <!-- =================================================================== -->
+    <target name="create-war" depends="prepare">
+         <jar destfile="${cashman.dist}/cashman.war"
+             basedir="${cashman.dist}/cashman"
+             includes="**/*">
+        </jar>
+    </target>
+
+    <!--===================================================================-->
+    <!-- Create Java docs and Zip it                                       -->
+    <!--===================================================================-->
+    <target name="javadoc" depends="prepare">
+        <javadoc
+                destdir="${cashman.doc}/javadoc"
+                author="true"
+                version="true"
+                use="true"
+                windowtitle="Cashman Javadoc"
+                sourcepathref="cashman.src.path"
+                overview="true"
+                verbose="true">
+            <doctitle><![CDATA[<h1>Cashman Javadoc</h1>]]></doctitle>
+            <bottom><![CDATA[<i>Copyright &#169; 2011 JR D'Amore. All Rights Reserved.</i>]]></bottom>
+            <classpath>
+                <path refid="cashman.lib.path"/>
+            </classpath>
+        </javadoc>
+    </target>
+
+    <!--=================================================================== -->
+    <!-- Compile Unit Tests                                                 -->
+    <!--=================================================================== -->
+    <target name="compile-unittest" depends="compile">
+        <javac srcdir="${cashman.unittest}"
+            destdir="${cashman.cls}"
+            debug="on"
+            deprecation="on"
+            optimize="on">
+            <classpath refid="cashman.lib.path"/>
+            <classpath refid="cashman.cls.path"/>
+        </javac>
+    </target>
+
+    <!--=================================================================== -->
+    <!-- Compile Jbehave Tests                                                 -->
+    <!--=================================================================== -->
+    <target name="compile-uitest" depends="compile, copy-stories">
+        <javac srcdir="${cashman.uitest}"
+            destdir="${cashman.cls}"
+            debug="on"
+            deprecation="on"
+            optimize="on">
+            <classpath refid="cashman.lib.path"/>
+            <classpath refid="cashman.cls.path"/>
+        </javac>
+    </target>
+
+    <!--=================================================================== -->
+    <!-- Instrument source code for Emma code coverage                      -->
+    <!--=================================================================== -->
+    <taskdef resource="emma_ant.properties" classpathref="cashman.lib.path" />
+    <target name="instrument">
+        <emma>
+            <instr instrpathref="cashman.cls.path"
+                   destdir="${cashman.cls_i}"
+                   metadatafile="${basedir}/metadata.emma"
+                   merge="true" />
+        </emma>
+    </target>
+
+
+    <!--=================================================================== -->
+    <!-- Run JUnit Unit Tests                                               -->
+    <!-- Execute Unit Tests with Tomcat running against instrumented classes  -->
+    <!-- Create Unit Tests and Emma code coverage reports                   -->
+    <!--=================================================================== -->
+    <target name="test-unit" description="Run Unit Tests"
+            depends="test-unit-run, test-unit-report" />
+
+    <target name="test-unit-run" depends="compile-unittest">
+         <mkdir dir="${cashman.doc}/junit"/>
+         <junit fork="yes" dir="${cashman.cls}" printsummary="true" haltonfailure="false">
+            <batchtest todir="${cashman.doc}/junit">
+                <fileset dir="${cashman.cls}" includes="test/**/Test*.class" />
+                <formatter type="xml"/>
+            </batchtest>
+            <classpath>
+                <path refid="cashman.lib.path" />
+                <pathelement location="${cashman.cls_i}" />
+                <path refid="cashman.cls.path" />
+            </classpath>
+            <jvmarg value="-Demma.coverage.out.file=${basedir}/junit.emma" />
+            <jvmarg value="-Demma.coverage.out.merge=true" />
+        </junit>
+    </target>
+
+    <target name="test-unit-report">
+        <junitreport todir="${cashman.doc}/junit">
+            <fileset dir="${cashman.doc}/junit"/>
+            <report todir="${cashman.doc}/junit"/>
+        </junitreport>
+        <delete>
+            <fileset dir="${cashman.doc}/junit" includes="*.xml" />
+        </delete>
+        <mkdir dir="${cashman.doc}/emma-junit"/>
+        <emma>
+            <report sourcepath="${cashman.src}" >
+                <fileset dir="${basedir}" >
+                    <include name="metadata.emma" />
+                    <include name="junit.emma" />
+                </fileset>
+                <txt outfile="${cashman.doc}/emma-junit/coverage.txt" />
+                <html outfile="${cashman.doc}/emma-junit/coverage.html" />
+            </report>
+        </emma>
+    </target>
+
+
+    <!--=================================================================== -->
+    <!-- Run JUnit JBehave Tests                                            -->
+    <!--=================================================================== -->
+    <target name="test-jbehave" description="Run JUnit JBehave Tests "
+            depends="test-jbehave-run, test-jbehave-report" />
+
+    <target name="test-jbehave-run" depends="compile-uitest">
+
+        <mkdir dir="${cashman.dist}/classes_temp" />
+        <copy todir="${cashman.dist}/classes_temp">
+            <fileset dir="${cashman.cls}" >
+                <include name="**/*.class" />
+                <include name="**/*.story" />
+            </fileset>
+        </copy>
+        <delete>
+            <fileset dir="${cashman.cls}" includes="**/*.class">
+                    <exclude name="stories/**/*Story.class"/>
+                    <exclude name="stories/**/*.story"/>
+            </fileset>
+        </delete>
+        <copy todir="${cashman.cls}">
+            <fileset dir="${cashman.cls_i}" >
+                <include name="**/*.class" />
+            </fileset>
+        </copy>
+        <antcall target="tomcat-start" />
+        <sleep milliseconds="3000"/>
+        <mkdir dir="${cashman.doc}/jbehave"/>
+        <junit fork="yes" printsummary="true" haltonfailure="false">
+            <!--<batchtest todir="${cashman.doc}/jbehave">-->
+                <!--<fileset dir="${cashman.dist}/classes_temp" includes="stories/**/*Story.class" />-->
+                <!--<formatter type="xml"/>-->
+            <!--</batchtest>-->
+            <batchtest>
+                <fileset dir="${cashman.dist}/classes_temp" includes="stories/**/*Story.class" />
+            </batchtest>
+            <classpath>
+                <path refid="cashman.lib.path" />
+                <pathelement location="${cashman.dist}/classes_temp" />
+            </classpath>
+            <jvmarg value="-Demma.coverage.out.file=${basedir}/jbehave.emma" />
+            <jvmarg value="-Demma.coverage.out.merge=true" />
+        </junit>
+        <antcall target="tomcat-stop" />
+        <delete>
+            <fileset dir="${cashman.cls}" includes="**/*.class"/>
+        </delete>
+        <copy todir="${cashman.cls}">
+            <fileset dir="${cashman.dist}/classes_temp" >
+                <include name="**/*.class" />
+            </fileset>
+        </copy>
+        <delete dir="${cashman.dist}/classes_temp"/>
+    </target>
+
+    <target name="test-jbehave-report">
+        <mkdir dir="${cashman.doc}/jbehave"/>
+        <junitreport todir="${cashman.doc}/jbehave">
+            <fileset dir="${cashman.doc}/jbehave"/>
+            <report todir="${cashman.doc}/jbehave"/>
+        </junitreport>
+        <delete>
+            <fileset dir="${cashman.doc}/jbehave" includes="*.xml" />
+        </delete>
+        <mkdir dir="${cashman.doc}/emma-jbehave"/>
+        <emma>
+            <report sourcepath="${cashman.src}" >
+                <fileset dir="${basedir}" >
+                    <include name="metadata.emma" />
+                    <include name="jbehave.emma" />
+                </fileset>
+                <txt outfile="${cashman.doc}/emma-jbehave/coverage.txt" />
+                <html outfile="${cashman.doc}/emma-jbehave/coverage.html" />
+            </report>
+        </emma>
+    </target>
+
+    <!--=================================================================== -->
+    <!-- Tomcat Stuffs                                                      -->
+    <!--=================================================================== -->
+    <property name="tomcat.home" value="/Users/jdamore/dev/bin/apache-tomcat-7.0.16" />
+    <target name="tomcat-start"
+            description="Start Tomcat using bootstrap loader">
+        <java classname="org.apache.catalina.startup.Bootstrap" fork="true" spawn="true">
+            <classpath path="${tomcat.home}/bin/bootstrap.jar:${tomcat.home}/bin/tomcat-juli.jar" />
+            <jvmarg value="-Djava.util.logging.manager=org.apache.juli.ClassLoaderLogManager" />
+            <jvmarg value="-Djava.util.logging.config.file=${tomcat.home}/conf/logging.properties" />
+            <jvmarg value="-Dcatalina.home=${tomcat.home}" />
+            <jvmarg value="-Dcatalina.base=${tomcat.home}" />
+            <!--<jvmarg value="-Djava.io.tmpdir=${tomcat.home}/temp" />-->
+            <jvmarg value="-Demma.coverage.out.file=${basedir}/selenium.emma" />
+            <jvmarg value="-Demma.coverage.out.merge=true" />
+            <arg line="start" />
+        </java>
+    </target>
+
+    <target name="tomcat-stop"
+            description="Stop Tomcat">
+        <exec executable="/bin/bash">
+            <arg value="${tomcat.home}/bin/shutdown.sh"/>
+        </exec>
+    </target>
+
+    <!--=================================================================== -->
+    <!-- Before Unit Tests                                                  -->
+    <!--=================================================================== -->
+    <target name="copy-fixtures">
+        <copy todir="${cashman.cls}" flatten="false">
+            <fileset dir="${cashman.unittest}" >
+                <include name="**/spring-fixtures*.xml" />
+            </fileset>
+        </copy>
+    </target>
+
+
+</project>
+

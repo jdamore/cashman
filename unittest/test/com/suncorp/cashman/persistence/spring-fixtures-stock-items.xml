@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+
+    <bean id="stockItem$50" class="com.suncorp.cashman.persistence.StockItem">
+        <property name="value" value="50"/>
+        <property name="quantity" value="2"/>
+    </bean>
+
+    <bean id="stockItem$20" class="com.suncorp.cashman.persistence.StockItem">
+        <property name="value" value="20"/>
+        <property name="quantity" value="3"/>
+    </bean>
+
+    <bean id="stockItem$10" class="com.suncorp.cashman.persistence.StockItem">
+        <property name="value" value="10"/>
+        <property name="quantity" value="4"/>
+    </bean>
+
+
+</beans>

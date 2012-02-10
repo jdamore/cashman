@@ -1,0 +1,212 @@
+=================================================================
+                  Cashman Java Test
+             By jean.damore - April 2011
+=================================================================
+
+-----------------------------------------------------------------
+0. Environment
+-----------------------------------------------------------------
+
+The code has been developed on a 64-bit Mac OS X 10.6 machine using
+the IntelliJ IDEA Java 10.0 Editor (CE), an an Apache Tomcat 7.0
+Web Server. The Unit Tests also use the JUnit 4.8.1 and Mockito
+1.8.5 libraries provided with the distribution.
+
+Note that building and running the project requires the following
+to be installed and configured on your machine ($PATH, $CLASSPATH,
+$ANT_HOME, $CATALINA_HOME):
+
+ a. Java Standard Edition Runtime Environment (JRE) version 6.0
+    or later
+ b. ANT version 1.7 or later (http://ant.apache.org)
+ c. A Web Server, ideally Tomcat version 7.0 or later
+    (http://tomcat.apache.org)
+
+-----------------------------------------------------------------
+1. Purpose & Requirements
+-----------------------------------------------------------------
+
+This project contains all the required code to implement, execute,
+and deploy the Cashman Java Web application. This implementation is
+based on the requirements provided by Suncorp, which are fulfilled
+as follows.
+
+Stock and initialisation
+------------------------
+
+The denominations for notes available in the CashMachine are defined
+in the NoteType enum, which currently has $5, $10, $20, $50, $100,
+and $200 notes. The CashMachine has an initial stock of cash modelled
+by the NoteSupply class. When first instantiated, the CashMachine
+arbitrarily sets its stock levels to 5 for each type of note. The
+stock of the CashMachine can be changed by calling the setStock()
+method.
+
+Withdrawal
+----------
+
+Withdrawal logic is implemented in the CashMachine.withdraw() method.
+If the withdrawal can't be fulfilled, the method throws a checked
+CannotSupplyException, and the stock of the CashMachine remains
+unchanged.
+The logic has been Unit Tested when the CashMachine contains only $20
+and $50 notes, implementing the test cases described by Suncorp in
+the TestCashMachineWithdraw JUnit Test Case. Also, using the web UI,
+one can test any other possible combination for all denominations
+int stock.
+
+
+-----------------------------------------------------------------
+2. Content
+-----------------------------------------------------------------
+
+List of directories/files and their content/purpose:
+
+    -o- dist        The archived (cashman.war) and exploded (cashman/)
+                    distributions of the Cashman Web Application
+
+    -o- doc         HTML JavaDoc files for the project
+
+    -o- test        HTML JUnit Test Results
+
+    -o- lib         Required additional libraries (JUnit, Commons,
+                    and Struts)
+
+    -o- src         Java Sources
+
+    -o- testsrc     JUnit Test Cases Sources
+
+    -o- build.xml   ANT build file
+
+    -o- README      This file
+
+
+------------------------------------------------------------------
+3. Code Structure
+------------------------------------------------------------------
+
+The code is split into 4 packages or layers:
+
+    -o- infrastructure
+    Contains the web.xml file, and may contain low-level APIs and/or
+    3rd party library bridges.
+
+    -o- domain
+    Where all business semantic and logic is defined and implemented.
+
+    -o- application
+    Contains the Controller classes of the MVC, i.e. our Struts Action
+    and it associated DTOs.
+
+    -o- presentation
+    Contains the Views of the MVC, i.e. our JSPs and client-side code,
+    here just CSS.
+
+
+-------------------------------------------------------------------
+4. JUnit Tests
+-------------------------------------------------------------------
+
+I have purposely decided to only Unit Test the Domain Layer,
+for lack of time, and since the Application Layer Unit Tests would
+only ensure collaboration is as expected.
+
+
+-------------------------------------------------------------------
+5. ANT targets
+-------------------------------------------------------------------
+
+The ANT build.xml file provides the following targets:
+
+    -o- prepare     Creates required directories for the distribution
+
+    -o- clean       Deletes the archived and expoded distribution
+
+    -o- compile     Compiles the Java code
+
+    -o- test        Compiles the JUnit Tests, runs them, and generates
+                    HTML tests reports
+
+    -o- doc         Generates HTML JavaDoc
+
+    -o- copy-xxx    Copies various files to the appropriate distribution
+                    directories
+
+    -o- build       Compile, test, and distribute the project
+
+
+-------------------------------------------------------------------
+6. Build the application and verify JUnit Tests results
+-------------------------------------------------------------------
+
+To run the code and check that it works as expected do the following:
+
+    a. Make sure Ant and Java are installed and are in your $PATH.
+
+    b. Open a command prompt, navigate to this directory and run
+       the command "ant test" (it will compile the code and execute
+       the JUnit Tests target).
+
+    c. After successful completion of the command, open the page
+       test/index.html.
+
+    d. The JUnit Test Case TestCashMachineWithdraw contains all tests
+       required by Suncorp to validate the withdrawal logic.
+
+
+-------------------------------------------------------------------
+7. Build and deploy the Web Application and test through the UI
+-------------------------------------------------------------------
+
+To deploy the web application and test its features do the following:
+
+    a. Make sure you have a JSP/Servlet-enabled Web Server installed,
+       we'll assume it is Tomcat on $CATALINA_HOME.
+
+    b. Make sure Ant and Java are installed and are in your PATH.
+
+    c. Open a command prompt, navigate to this directory and run
+       the command "ant" (it will build the app and generate the WAR).
+
+    d. Deploy the created WAR in your web server. For Tomcat just
+       copy cashman.war under $CATALINE_HOME/webapps.
+
+    e. Open a web navigator and go to http://<your_web_server_url>/cashman.
+       For Tomcat with default settings it'll be http://localhost:8080/cashman.
+
+    d. The Save button allows saving new stock quantities to the
+       CashMachine. The Withdraw button allows attempting to withdraw
+       the specified amount from the CashMachine.
+
+    f. Set the stock to be only 3x$50 notes and 8x$20 notes and try to
+       withdraw $20, $40, $50, $60, $70, $80, $100, $110, $150, $200.
+       You should see the supplied notes listed, and the corresponding
+       CashMachine stock being reduced.
+
+    g. Try to withdraw an amount that can't be supplied.
+       You will see an error message like "Sorry, can't supply the
+       amount. Try again later. "
+
+
+-------------------------------------------------------------------
+8. Requirements completion, potential improvement and additions
+-------------------------------------------------------------------
+
+    a. All mandatory requirements are believed to be covered.
+
+    b. In addition, the system supports all possible Australian note
+       denominations.
+
+    c. There is no client-side validation to check user inputs.
+
+    d. No "global" exception handling in the UI.
+       Any unexpected exception will go to a HTTP 500 Error page.
+
+    e. Withdrawal algorithm could be improved to provide better
+       balance of the returned denominations.
+
+    f. Additional features such as withdrawal notes options and
+       notifications have not been implemented.
+
+    g. Code coverage for the Domain Layer has not been verified
+       because the version of IDEA used does not provide this metric.
