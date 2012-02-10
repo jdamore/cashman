@@ -302,9 +302,9 @@
             <fileset dir="${cashman.doc}/junit"/>
             <report todir="${cashman.doc}/junit"/>
         </junitreport>
-        <delete>
-            <fileset dir="${cashman.doc}/junit" includes="*.xml" />
-        </delete>
+        <!--<delete>-->
+            <!--<fileset dir="${cashman.doc}/junit" includes="*.xml" />-->
+        <!--</delete>-->
         <mkdir dir="${cashman.doc}/emma-junit"/>
         <emma>
             <report sourcepath="${cashman.src}" >
