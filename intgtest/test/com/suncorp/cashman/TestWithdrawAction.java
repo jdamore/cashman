@@ -42,6 +42,7 @@ public class TestWithdrawAction {
         }
     }
 
+
     private void checkSuppliedNotes() {
         for(NoteSupplyDTO stockItem : cashMachineAction.getWithdrawal()) {
             if(stockItem.getNoteType().equals(NoteType.$200.toString())) {
