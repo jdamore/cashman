@@ -127,7 +127,7 @@
     <!-- Copy Struts XML config files to distribution                        -->
     <!-- =================================================================== -->
     <target name="copy-struts-config" depends="prepare">
-        <copy toDir="${cashman.dist}/cashman/WEB-INF/classes" flatten="true">
+        <copy toDir="${cashman.cls}" flatten="true">
             <fileset dir="${cashman.src}">
                 <include name="**/*struts*.xml"/>
             </fileset>
@@ -138,7 +138,7 @@
     <!-- Copy Spring config files to distribution                            -->
     <!-- =================================================================== -->
     <target name="copy-spring-config" depends="prepare">
-        <copy toDir="${cashman.dist}/cashman/WEB-INF/classes" flatten="true">
+        <copy toDir="${cashman.cls}" flatten="true">
             <fileset dir="${cashman.cfg}">
                 <include name="**/spring-context-*.xml"/>
             </fileset>
@@ -233,7 +233,7 @@
     <!--=================================================================== -->
     <!-- Compile Unit Tests                                                 -->
     <!--=================================================================== -->
-    <target name="compile-unittest" depends="compile">
+    <target name="compile-unittest" depends="compile, copy-spring-config">
         <javac srcdir="${cashman.unittest}"
             destdir="${cashman.cls}"
             debug="on"
@@ -242,6 +242,11 @@
             <classpath refid="cashman.lib.path"/>
             <classpath refid="cashman.cls.path"/>
         </javac>
+        <copy toDir="${cashman.cls}" flatten="false">
+            <fileset dir="${cashman.unittest}">
+                <include name="**/spring-fixtures-*.xml"/>
+            </fileset>
+        </copy>
     </target>
 
     <!--=================================================================== -->
