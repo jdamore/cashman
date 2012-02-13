@@ -4,7 +4,7 @@
 
 <s:form action="cashmachine" name="cashmachine" theme="simple">
 
-    <h1 class="title">Cash Machine</h1>
+    <h1 class="title">Waooo Cash Machine !!</h1>
     <table width="250" border="0" cellpadding="0" cellspacing="2">
         <tr>
             <td width="200">Note Type</td>
