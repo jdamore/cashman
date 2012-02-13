@@ -69,6 +69,7 @@
     <!-- Build Target                                                         -->
     <!-- =================================================================== -->
     <target name="build" description="Main Build Target">
+        <antcall target="clean" />
         <antcall target="prepare" />
         <antcall target="compile" />
         <antcall target="instrument" />
@@ -152,6 +153,11 @@
         <copy toDir="${cashman.dist}/cashman/WEB-INF/lib" flatten="true">
             <fileset dir="${cashman.lib}">
                 <include name="**/*.jar"/>
+                <exclude name="cobertura/*" />
+                <exclude name="emma/*" />
+                <exclude name="jbehave/*" />
+                <exclude name="junit/*" />
+                <exclude name="selenium/*" />
             </fileset>
         </copy>
         <copy toDir="${cashman.dist}/cashman/WEB-INF/lib/tld" flatten="true">
