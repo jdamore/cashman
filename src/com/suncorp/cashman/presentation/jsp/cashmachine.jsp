@@ -9,19 +9,22 @@
 <%
     Properties properties = new Properties();
     String buildID = null;
+    String errorMessage = "";
     try {
-        properties.load(new FileInputStream("build.properties"));
-        buildID = (String)properties.get("build.id");
+        properties = new Properties();
+        properties.load(Thread.currentThread().getContextClassLoader().getResourceAsStream("build.properties"));
+        buildID = properties.getProperty("build.id");
     }
     catch (IOException e) {
         buildID = "ERROR reading build.properties";
+        errorMessage = e.getMessage();
     }
     if (buildID.length()==0) buildID="LOCAL";
 %>
 
 <s:form action="cashmachine" name="cashmachine" theme="simple">
 
-    <table width="60%" border="0" style="color:#aaaaaa;font-size:10pt;"><tr><td align="right">build: <%=buildID%></td></tr></table>
+    <table width="60%" border="0" style="color:#aaaaaa;font-size:10pt;"><tr><td align="right"><%=buildID + " " + errorMessage%></td></tr></table>
 
     <h1 class="title">Cash Machine</h1>
     <table width="250" border="0" cellpadding="0" cellspacing="2">
