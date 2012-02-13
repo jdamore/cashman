@@ -1,10 +1,29 @@
+<%@ page import="java.util.Properties" %>
+<%@ page import="java.io.FileInputStream" %>
+<%@ page import="java.io.IOException" %>
 <%@ taglib prefix="s" uri="/WEB-INF/lib/tld/struts-tags.tld" %>
 <%@ page contentType="text/html; charset=UTF-8"%>
 <link href="<%=request.getContextPath()%>/css/cashmachine.css" rel="stylesheet" type="text/css">
 
+
+<%
+    Properties properties = new Properties();
+    String buildID = null;
+    try {
+        properties.load(new FileInputStream("build.properties"));
+        buildID = (String)properties.get("build.id");
+    }
+    catch (IOException e) {
+        buildID = "ERROR reading build.properties";
+    }
+    if (buildID.length()==0) buildID="LOCAL";
+%>
+
 <s:form action="cashmachine" name="cashmachine" theme="simple">
 
-    <h1 class="title">Cash Machine !!</h1>
+    <table width="60%" border="0" style="color:#aaaaaa;font-size:10pt;"><tr><td align="right">build: <%=buildID%></td></tr></table>
+
+    <h1 class="title">Cash Machine</h1>
     <table width="250" border="0" cellpadding="0" cellspacing="2">
         <tr>
             <td width="200">Note Type</td>
