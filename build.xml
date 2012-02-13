@@ -4,6 +4,7 @@
     <!-- Properties                                                          -->
     <!-- =================================================================== -->
     <property file="build.properties"/>
+    <property environment="env"/>
 
     <!-- =================================================================== -->
     <!-- Application Classes and Libraries Paths                             -->
@@ -209,7 +210,8 @@
     <!-- Create cashman.war                                                  -->
     <!-- =================================================================== -->
     <target name="create-war" depends="prepare">
-         <jar destfile="${cashman.dist}/cashman.war"
+        <echo message="Will create archive ${env.BUILD_NUMBER}_cashman.war" />
+         <jar destfile="${cashman.dist}/${env.BUILD_NUMBER}_cashman.war"
              basedir="${cashman.dist}/cashman"
              includes="**/*">
         </jar>
