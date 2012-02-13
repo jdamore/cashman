@@ -4,7 +4,6 @@
     <!-- Properties                                                          -->
     <!-- =================================================================== -->
     <property file="build.properties"/>
-    <property environment="env"/>
 
     <!-- =================================================================== -->
     <!-- Application Classes and Libraries Paths                             -->
@@ -96,7 +95,7 @@
         <antcall target="copy-jsp" />
         <antcall target="copy-css" />
         <antcall target="javadoc" />
-        <antcall target="create-war" />
+        <antcall target="package" />
     </target>
 
     <!--=================================================================== -->
@@ -209,9 +208,10 @@
     <!-- =================================================================== -->
     <!-- Create cashman.war                                                  -->
     <!-- =================================================================== -->
-    <target name="create-war" depends="prepare">
-        <echo message="Will create archive ${env.BUILD_NUMBER}_cashman.war" />
-         <jar destfile="${cashman.dist}/${env.BUILD_NUMBER}_cashman.war"
+    <target name="package" depends="prepare">
+        <echo message="Will create archive ${build.id}_cashman.war" />
+        <echo file="${cashman.cls}/build.properties">build.id=${build.id}</echo>
+         <jar destfile="${cashman.dist}/${build.id}_cashman.war"
              basedir="${cashman.dist}/cashman"
              includes="**/*">
         </jar>
