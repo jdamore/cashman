@@ -380,8 +380,9 @@
                     <include name="metadata.emma" />
                     <include name="junit.emma" />
                 </fileset>
-                <txt outfile="${cashman.doc}/emma-intg/coverage.txt" />
-                <html outfile="${cashman.doc}/emma-intg/coverage.html" />
+                <xml outfile="${cashman.doc}/emma-intg/coverage.xml" />
+                <!--<txt outfile="${cashman.doc}/emma-intg/coverage.txt" />-->
+                <!--<html outfile="${cashman.doc}/emma-intg/coverage.html" />-->
             </report>
         </emma>
     </target>
