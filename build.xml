@@ -258,6 +258,20 @@
     </target>
 
     <!--=================================================================== -->
+    <!-- Compile Intg Tests                                                 -->
+    <!--=================================================================== -->
+    <target name="compile-intgtest" depends="compile">
+        <javac srcdir="${cashman.intgtest}"
+            destdir="${cashman.cls}"
+            debug="on"
+            deprecation="on"
+            optimize="on">
+            <classpath refid="cashman.lib.path"/>
+            <classpath refid="cashman.cls.path"/>
+        </javac>
+    </target>
+
+    <!--=================================================================== -->
     <!-- Compile Jbehave Tests                                                 -->
     <!--=================================================================== -->
     <target name="compile-uitest" depends="compile, copy-stories">
@@ -315,9 +329,6 @@
             <fileset dir="${cashman.doc}/junit"/>
             <report todir="${cashman.doc}/junit"/>
         </junitreport>
-        <!--<delete>-->
-            <!--<fileset dir="${cashman.doc}/junit" includes="*.xml" />-->
-        <!--</delete>-->
         <mkdir dir="${cashman.doc}/emma-junit"/>
         <emma>
             <report sourcepath="${cashman.src}" >
@@ -325,8 +336,52 @@
                     <include name="metadata.emma" />
                     <include name="junit.emma" />
                 </fileset>
-                <txt outfile="${cashman.doc}/emma-junit/coverage.txt" />
-                <html outfile="${cashman.doc}/emma-junit/coverage.html" />
+                <xml outfile="${cashman.doc}/emma-junit/coverage.xml" />
+                <!--<txt outfile="${cashman.doc}/emma-junit/coverage.txt" />-->
+                <!--<html outfile="${cashman.doc}/emma-junit/coverage.html" />-->
+            </report>
+        </emma>
+    </target>
+
+    <!--=================================================================== -->
+    <!-- Run JUnit INTG Tests                                               -->
+    <!-- Execute Unit Tests with Tomcat running against instrumented classes  -->
+    <!-- Create Unit Tests and Emma code coverage reports                   -->
+    <!--=================================================================== -->
+    <target name="test-intg" description="Run Intg Tests"
+            depends="test-intg-run, test-intg-report" />
+
+    <target name="test-intg-run" depends="compile-intgtest">
+         <mkdir dir="${cashman.doc}/intg"/>
+         <junit fork="yes" dir="${cashman.cls}" printsummary="true" haltonfailure="false">
+            <batchtest todir="${cashman.doc}/intg">
+                <fileset dir="${cashman.cls}" includes="test/**/Intg*.class" />
+                <formatter type="xml"/>
+            </batchtest>
+            <classpath>
+                <path refid="cashman.lib.path" />
+                <pathelement location="${cashman.cls_i}" />
+                <path refid="cashman.cls.path" />
+            </classpath>
+            <jvmarg value="-Demma.coverage.out.file=${basedir}/intg.emma" />
+            <jvmarg value="-Demma.coverage.out.merge=true" />
+        </junit>
+    </target>
+
+    <target name="test-intg-report">
+        <junitreport todir="${cashman.doc}/intg">
+            <fileset dir="${cashman.doc}/intg"/>
+            <report todir="${cashman.doc}/intg"/>
+        </junitreport>
+        <mkdir dir="${cashman.doc}/emma-junit"/>
+        <emma>
+            <report sourcepath="${cashman.src}" >
+                <fileset dir="${basedir}" >
+                    <include name="metadata.emma" />
+                    <include name="junit.emma" />
+                </fileset>
+                <txt outfile="${cashman.doc}/emma-intg/coverage.txt" />
+                <html outfile="${cashman.doc}/emma-intg/coverage.html" />
             </report>
         </emma>
     </target>
