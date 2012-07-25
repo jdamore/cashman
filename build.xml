@@ -76,14 +76,6 @@
         <antcall target="dist" />
     </target>
 
-     <!-- =================================================================== -->
-    <!-- Build Target                                                         -->
-    <!-- =================================================================== -->
-    <target name="test" description="Test Build Target">
-        <antcall target="test-unit" />
-        <antcall target="test-selenium" />
-    </target>
-
     <!-- =================================================================== -->
     <!-- Dist Target                                                         -->
     <!-- =================================================================== -->
@@ -96,6 +88,16 @@
         <antcall target="copy-css" />
         <antcall target="javadoc" />
         <antcall target="package" />
+    </target>
+
+    <!-- =================================================================== -->
+    <!-- Rebuild & Deploy Target                                             -->
+    <!-- =================================================================== -->
+    <target name="cd" description="Rebuild and Deploy Target">
+        <antcall target="clean" />
+        <antcall target="build" />
+        <antcall target="dist" />
+        <antcall target="tomcat-restart" />
     </target>
 
     <!--=================================================================== -->
@@ -211,7 +213,8 @@
     <target name="package" depends="prepare">
         <echo message="Will create archive ${build.id}_cashman.war" />
         <echo file="${cashman.cls}/build.properties">build.id=${build.id}</echo>
-         <jar destfile="${cashman.dist}/${build.id}_cashman.war"
+         <!--<jar destfile="${cashman.dist}/${build.id}_cashman.war"-->
+         <jar destfile="${cashman.dist}/cashman.war"
              basedir="${cashman.dist}/cashman"
              includes="**/*">
         </jar>
@@ -378,7 +381,7 @@
             <report sourcepath="${cashman.src}" >
                 <fileset dir="${basedir}" >
                     <include name="metadata.emma" />
-                    <include name="junit.emma" />
+                    <include name="intg.emma" />
                 </fileset>
                 <xml outfile="${cashman.doc}/emma-intg/coverage.xml" />
                 <!--<txt outfile="${cashman.doc}/emma-intg/coverage.txt" />-->
@@ -470,8 +473,8 @@
     <!-- Tomcat Stuffs                                                      -->
     <!--=================================================================== -->
     <property name="tomcat.home" value="/Users/jdamore/dev/bin/apache-tomcat-7.0.16" />
-    <target name="tomcat-start"
-            description="Start Tomcat using bootstrap loader">
+
+    <target name="tomcat-start">
         <java classname="org.apache.catalina.startup.Bootstrap" fork="true" spawn="true">
             <classpath path="${tomcat.home}/bin/bootstrap.jar:${tomcat.home}/bin/tomcat-juli.jar" />
             <jvmarg value="-Djava.util.logging.manager=org.apache.juli.ClassLoaderLogManager" />
@@ -485,11 +488,16 @@
         </java>
     </target>
 
-    <target name="tomcat-stop"
-            description="Stop Tomcat">
+    <target name="tomcat-stop">
         <exec executable="/bin/bash">
             <arg value="${tomcat.home}/bin/shutdown.sh"/>
         </exec>
+    </target>
+
+    <target name="tomcat-restart" description="Restart Tomcat">
+        <antcall target="tomcat-stop" />
+        <sleep seconds="2" />
+        <antcall target="tomcat-start" />
     </target>
 
     <!--=================================================================== -->
