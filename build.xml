@@ -336,7 +336,6 @@
         <mkdir dir="${cashman.doc}/emma-junit"/>
         <emma>
             <report sourcepath="${cashman.src}" >
-                <filter excludes="sel.com.*, stories.com.*, test.com.*" />
                 <fileset dir="${basedir}" >
                     <include name="metadata.emma" />
                     <include name="junit.emma" />
