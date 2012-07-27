@@ -87,7 +87,6 @@
         <antcall target="copy-lib" />
         <antcall target="copy-jsp" />
         <antcall target="copy-css" />
-        <antcall target="javadoc" />
         <antcall target="package" />
     </target>
 
