@@ -298,7 +298,6 @@
                    destdir="${cashman.cls_i}"
                    metadatafile="${basedir}/metadata.emma"
                    merge="true" />
-            <filter excludes="sel.com.*, stories.com.*, test.com.*" />
         </emma>
     </target>
 
