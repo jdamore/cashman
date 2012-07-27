@@ -61,7 +61,8 @@
     <target name="all" description="Default Target">
         <antcall target="clean" />
         <antcall target="build" />
-        <antcall target="test" />
+        <antcall target="test-unit" />
+        <antcall target="test-intg" />
         <antcall target="javadoc" />
     </target>
 
@@ -213,8 +214,7 @@
     <target name="package" depends="prepare">
         <echo message="Will create archive ${build.id}_cashman.war" />
         <echo file="${cashman.cls}/build.properties">build.id=${build.id}</echo>
-         <!--<jar destfile="${cashman.dist}/${build.id}_cashman.war"-->
-         <jar destfile="${cashman.dist}/cashman.war"
+         <jar destfile="${cashman.dist}/${build.id}_cashman.war"
              basedir="${cashman.dist}/cashman"
              includes="**/*">
         </jar>
@@ -298,6 +298,7 @@
                    destdir="${cashman.cls_i}"
                    metadatafile="${basedir}/metadata.emma"
                    merge="true" />
+            <filter excludes="sel.com.*, stories.com.*, test.com.*" />
         </emma>
     </target>
 
@@ -335,6 +336,7 @@
         <mkdir dir="${cashman.doc}/emma-junit"/>
         <emma>
             <report sourcepath="${cashman.src}" >
+                <filter excludes="sel.com.*, stories.com.*, test.com.*" />
                 <fileset dir="${basedir}" >
                     <include name="metadata.emma" />
                     <include name="junit.emma" />
