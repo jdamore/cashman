@@ -1,6 +1,8 @@
 package com.suncorp.cashman.domain;
 
 import com.suncorp.cashman.persistence.StockDAO;
+import com.suncorp.cashman.persistence.StockItem;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.*;
 
@@ -24,6 +26,7 @@ public class CashMachine {
 
     private StockDAO stockDAO;
 
+    @Autowired
     public void setStockDAO(StockDAO stockDAO) {
         this.stockDAO = stockDAO;
     }
@@ -64,11 +67,20 @@ public class CashMachine {
      * @throws IllegalArgumentException is the given list is null.
      */
     public void setStock(Set<NoteSupply> stock) {
-        if(stock ==null) {
+        if(stock==null) {
             throw new IllegalArgumentException("Can't take a null stock");
         }
         this.stock = stock;
+        saveStock();
     }
+
+
+    private void saveStock() {
+        for(NoteSupply noteSupply : this.getStock()) {
+            stockDAO.saveStockItem(noteSupply.getStockItem());
+        }
+    }
+
 
     /**
      * Attempts to withdraw the given amount from the CashMachine.
@@ -195,9 +207,39 @@ public class CashMachine {
         NoteSupply suppliedNote = noteSupply.supplyFully(amount);
         if(suppliedNote!=null) {
             suppliedNotes.put(suppliedNote.getNoteType(), suppliedNote);
-            return suppliedNote.getValue();
+            return suppliedNote.getQuantity()*suppliedNote.getNoteType().getValue();
         }
         return 0;
     }
 
+    private NoteSupply getNoteSupplyForValue(long value) {
+        for(NoteSupply noteSupply : getStock()) {
+            if(noteSupply.getNoteType().getValue()==value) return noteSupply;
+        }
+        return null;
+    }
+
 }
+
+
+
+
+
+
+
+
+
+
+
+
+//        if(savedStock.isEmpty()) {
+//            for(NoteSupply noteSupply : this.getStock()) {
+//                stockDAO.saveStockItem(noteSupply);
+//            }
+//        }
+//        else {
+//            for(StockItem existingStockItem : stockDAO.getStock()) {
+//                existingStockItem.setQuantity(getNoteSupplyForValue(existingStockItem.getValue()).getQuantity());
+//                stockDAO.saveStockItem(existingStockItem);
+//            }
+//        }

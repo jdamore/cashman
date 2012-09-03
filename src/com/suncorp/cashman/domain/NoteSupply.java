@@ -1,17 +1,17 @@
 package com.suncorp.cashman.domain;
 
+import com.suncorp.cashman.persistence.StockItem;
+
 /**
  * Domain Object for a supply/withdrawal of Notes in/from the CashMachine.
  * @author jean.damore
  * @since 06-Apr-2011
  */
-public class NoteSupply implements Comparable<NoteSupply> {
+public class NoteSupply implements Comparable<NoteSupply>  {
 
     /** The type of note e.g. $20, $50, etc... */
     private NoteType noteType;
-
-    /** The quantity supplied or withdrawn. */
-    private int quantity;
+    private StockItem stockItem;
 
     /**
      * Constructor that takes a noteType.
@@ -24,7 +24,9 @@ public class NoteSupply implements Comparable<NoteSupply> {
             throw new IllegalArgumentException("Can't take a null noteType");
         }
         this.noteType = noteType;
-        this.quantity = 0;
+        this.stockItem = new StockItem();
+        this.stockItem.setQuantity(0);
+        this.stockItem.setValue(noteType.getValue());
     }
 
     /**
@@ -41,23 +43,29 @@ public class NoteSupply implements Comparable<NoteSupply> {
             throw new IllegalArgumentException("Can't take a <0 quantity");
         }
         this.noteType = noteType;
-        this.quantity = quantity;
+        this.stockItem = new StockItem();
+        this.stockItem.setQuantity(quantity);
+        this.stockItem.setValue(noteType.getValue());
     }
 
     public NoteType getNoteType() {
         return noteType;
     }
 
+    public StockItem getStockItem() {
+        return this.stockItem;
+    }
+
     public int getQuantity() {
-        return quantity;
+        return this.stockItem.getQuantity();
     }
 
     public void setQuantity(int quantity) {
-        this.quantity = quantity;
+        this.stockItem.setQuantity(quantity);
     }
 
     public int getValue() {
-        return getQuantity()*getNoteType().getValue();
+        return this.stockItem.getValue();
     }
 
     /**
@@ -69,7 +77,7 @@ public class NoteSupply implements Comparable<NoteSupply> {
         if(quantity<0) {
             throw new IllegalArgumentException("Can't take a <0 quantity");
         }
-        setQuantity(getQuantity()+quantity);
+        this.stockItem.setQuantity(this.stockItem.getQuantity()+quantity);
     }
 
     /**
@@ -82,13 +90,12 @@ public class NoteSupply implements Comparable<NoteSupply> {
         if(quantity<0) {
             throw new IllegalArgumentException("Can't take a <0 quantity");
         }
-        if(quantity>this.getQuantity()) {
+        if(quantity>this.stockItem.getQuantity()) {
             throw new IllegalStateException("Can't remove a quantity " + quantity +
-                    " greater than the current quantity " + getQuantity());
+                    " greater than the current quantity " + this.stockItem.getQuantity());
         }
-        setQuantity(getQuantity()-quantity);
+        this.stockItem.setQuantity(this.stockItem.getQuantity()-quantity);
     }
-
 
     /**
      *
@@ -104,7 +111,7 @@ public class NoteSupply implements Comparable<NoteSupply> {
             return null;
         }
         int numRequiredNotes = (int) amount / noteTypeValue;
-        if(getQuantity() < numRequiredNotes) {
+        if(this.stockItem.getQuantity() < numRequiredNotes) {
             return null;
         }
         remove(numRequiredNotes);

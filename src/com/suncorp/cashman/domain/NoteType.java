@@ -21,4 +21,20 @@ public enum NoteType {
     public int getValue() {
         return value;
     }
+
+
+    public static class DoesNotExistException extends Exception {
+        public DoesNotExistException(String message) { super(message); }
+    }
+    public static NoteType getNoteTypeForValue(int value) throws DoesNotExistException {
+        switch(value) {
+            case 5:   return $5;
+            case 10:  return $10;
+            case 20:  return $20;
+            case 50:  return $50;
+            case 100: return $100;
+            case 200: return $200;
+            default: throw new DoesNotExistException("There is no note type for value $" + value + "!");
+        }
+    }
 }

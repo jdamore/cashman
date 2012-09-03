@@ -5,6 +5,8 @@
 		  http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
            version="2.5">
 
+    <display-name>Cashmachine Web App</display-name>
+
     <!-- Struts 2 config -->
     <filter>
         <filter-name>struts2</filter-name>
@@ -15,5 +17,22 @@
         <filter-name>struts2</filter-name>
         <url-pattern>/*</url-pattern>
     </filter-mapping>
+
+    <context-param>
+        <param-name>contextConfigLocation</param-name>
+        <param-value>classpath:spring-appcontext.xml</param-value>
+    </context-param>
+
+    <listener>
+        <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+    </listener>
+
+    <!--<listener>-->
+      <!--<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>-->
+   <!--</listener>-->
+   <!--<context-param>-->
+      <!--<param-name>contextConfigLocation</param-name>-->
+      <!--<param-value>classpath:/config/dev/spring-cashmachine.xml, classpath:/config/dev/spring-dao.xml, classpath:/config/dev/spring-datasource.xml</param-value>-->
+   <!--</context-param>-->
 
 </web-app>

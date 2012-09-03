@@ -13,7 +13,6 @@ public class StockDAOImpl implements StockDAO {
         this.hibernateTemplate = new HibernateTemplate(sessionFactory);
     }
 
-
     public void saveStockItem(StockItem stockItem) {
         hibernateTemplate.saveOrUpdate(stockItem);
     }

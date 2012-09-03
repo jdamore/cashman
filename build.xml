@@ -61,8 +61,8 @@
     <target name="all" description="Default Target">
         <antcall target="clean" />
         <antcall target="build" />
-        <antcall target="test-unit" />
-        <antcall target="test-intg" />
+        <antcall target="utest" />
+        <antcall target="itest" />
         <antcall target="javadoc" />
     </target>
 
@@ -142,8 +142,19 @@
     <!-- =================================================================== -->
     <target name="copy-spring-config" depends="prepare">
         <copy toDir="${cashman.cls}" flatten="true">
-            <fileset dir="${cashman.cfg}">
-                <include name="**/spring-context-*.xml"/>
+            <fileset dir="${cashman.home}">
+                <include name="config/${cashman.env}/spring-*.xml"/>
+            </fileset>
+        </copy>
+    </target>
+
+    <!-- =================================================================== -->
+    <!-- Copy Spring config files for integration testing to classpath       -->
+    <!-- =================================================================== -->
+    <target name="copy-spring-config-itest" depends="prepare">
+        <copy toDir="${cashman.cls}" flatten="true">
+            <fileset dir="${cashman.home}">
+                <include name="config/test/spring-*.xml"/>
             </fileset>
         </copy>
     </target>
@@ -201,7 +212,7 @@
     <!-- =================================================================== -->
     <target name="copy-stories" depends="prepare">
         <copy toDir="${cashman.dist}/cashman/WEB-INF/classes" flatten="false">
-            <fileset dir="${cashman.uitest}">
+            <fileset dir="${cashman.ftest}">
                 <include name="**/*.story"/>
             </fileset>
         </copy>
@@ -243,8 +254,8 @@
     <!--=================================================================== -->
     <!-- Compile Unit Tests                                                 -->
     <!--=================================================================== -->
-    <target name="compile-unittest" depends="compile, copy-spring-config">
-        <javac srcdir="${cashman.unittest}"
+    <target name="compile-utest" depends="compile, copy-spring-config">
+        <javac srcdir="${cashman.utest}"
             destdir="${cashman.cls}"
             debug="on"
             deprecation="on"
@@ -253,7 +264,7 @@
             <classpath refid="cashman.cls.path"/>
         </javac>
         <copy toDir="${cashman.cls}" flatten="false">
-            <fileset dir="${cashman.unittest}">
+            <fileset dir="${cashman.utest}">
                 <include name="**/spring-fixtures-*.xml"/>
             </fileset>
         </copy>
@@ -262,8 +273,8 @@
     <!--=================================================================== -->
     <!-- Compile Intg Tests                                                 -->
     <!--=================================================================== -->
-    <target name="compile-intgtest" depends="compile">
-        <javac srcdir="${cashman.intgtest}"
+    <target name="compile-itest" depends="compile">
+        <javac srcdir="${cashman.itest}"
             destdir="${cashman.cls}"
             debug="on"
             deprecation="on"
@@ -276,8 +287,8 @@
     <!--=================================================================== -->
     <!-- Compile Jbehave Tests                                                 -->
     <!--=================================================================== -->
-    <target name="compile-uitest" depends="compile, copy-stories">
-        <javac srcdir="${cashman.uitest}"
+    <target name="compile-ftest" depends="compile, copy-stories">
+        <javac srcdir="${cashman.ftest}"
             destdir="${cashman.cls}"
             debug="on"
             deprecation="on"
@@ -306,10 +317,10 @@
     <!-- Execute Unit Tests with Tomcat running against instrumented classes  -->
     <!-- Create Unit Tests and Emma code coverage reports                   -->
     <!--=================================================================== -->
-    <target name="test-unit" description="Run Unit Tests"
-            depends="test-unit-run, test-unit-report" />
+    <target name="utest" description="Run Unit Tests"
+            depends="utest-run, utest-report" />
 
-    <target name="test-unit-run" depends="compile-unittest">
+    <target name="utest-run" depends="compile-utest, instrument">
          <mkdir dir="${cashman.doc}/junit"/>
          <junit fork="yes" dir="${cashman.cls}" printsummary="true" haltonfailure="false">
             <batchtest todir="${cashman.doc}/junit">
@@ -326,7 +337,7 @@
         </junit>
     </target>
 
-    <target name="test-unit-report">
+    <target name="utest-report">
         <junitreport todir="${cashman.doc}/junit">
             <fileset dir="${cashman.doc}/junit"/>
             <report todir="${cashman.doc}/junit"/>
@@ -350,14 +361,16 @@
     <!-- Execute Unit Tests with Tomcat running against instrumented classes  -->
     <!-- Create Unit Tests and Emma code coverage reports                   -->
     <!--=================================================================== -->
-    <target name="test-intg" description="Run Intg Tests"
-            depends="test-intg-run, test-intg-report" />
+    <target name="itest" description="Run Intg Tests">
+            <antcall target="itest-run" />
+            <antcall target="itest-report" />
+    </target>
 
-    <target name="test-intg-run" depends="compile-intgtest">
+    <target name="itest-run" depends="compile-itest, copy-spring-config-itest, instrument">
          <mkdir dir="${cashman.doc}/intg"/>
          <junit fork="yes" dir="${cashman.cls}" printsummary="true" haltonfailure="false">
             <batchtest todir="${cashman.doc}/intg">
-                <fileset dir="${cashman.cls}" includes="test/**/Intg*.class" />
+                <fileset dir="${cashman.cls}" includes="test/**/iTest*.class" excludes="test/**/iTestBase.class"/>
                 <formatter type="xml"/>
             </batchtest>
             <classpath>
@@ -370,7 +383,7 @@
         </junit>
     </target>
 
-    <target name="test-intg-report">
+    <target name="itest-report">
         <junitreport todir="${cashman.doc}/intg">
             <fileset dir="${cashman.doc}/intg"/>
             <report todir="${cashman.doc}/intg"/>
@@ -393,10 +406,10 @@
     <!--=================================================================== -->
     <!-- Run JUnit JBehave Tests                                            -->
     <!--=================================================================== -->
-    <target name="test-jbehave" description="Run JUnit JBehave Tests "
-            depends="test-jbehave-run, test-jbehave-report" />
+    <target name="ftest" description="Run JUnit JBehave Tests "
+            depends="ftest-run, ftest-report" />
 
-    <target name="test-jbehave-run" depends="compile-uitest">
+    <target name="ftest-run" depends="compile-ftest">
 
         <mkdir dir="${cashman.dist}/classes_temp" />
         <copy todir="${cashman.dist}/classes_temp">
@@ -416,8 +429,8 @@
                 <include name="**/*.class" />
             </fileset>
         </copy>
-        <antcall target="tomcat-start" />
-        <sleep milliseconds="3000"/>
+        <!--<antcall target="tomcat-start" />-->
+        <!--<sleep milliseconds="3000"/>-->
         <mkdir dir="${cashman.doc}/jbehave"/>
         <junit fork="yes" printsummary="true" haltonfailure="false">
             <!--<batchtest todir="${cashman.doc}/jbehave">-->
@@ -434,7 +447,7 @@
             <jvmarg value="-Demma.coverage.out.file=${basedir}/jbehave.emma" />
             <jvmarg value="-Demma.coverage.out.merge=true" />
         </junit>
-        <antcall target="tomcat-stop" />
+        <!--<antcall target="tomcat-stop" />-->
         <delete>
             <fileset dir="${cashman.cls}" includes="**/*.class"/>
         </delete>
@@ -446,7 +459,7 @@
         <delete dir="${cashman.dist}/classes_temp"/>
     </target>
 
-    <target name="test-jbehave-report">
+    <target name="ftest-report">
         <mkdir dir="${cashman.doc}/jbehave"/>
         <junitreport todir="${cashman.doc}/jbehave">
             <fileset dir="${cashman.doc}/jbehave"/>
@@ -504,7 +517,7 @@
     <!--=================================================================== -->
     <target name="copy-fixtures">
         <copy todir="${cashman.cls}" flatten="false">
-            <fileset dir="${cashman.unittest}" >
+            <fileset dir="${cashman.utest}" >
                 <include name="**/spring-fixtures*.xml" />
             </fileset>
         </copy>

@@ -1,6 +1,5 @@
 package com.suncorp.cashman.application.action;
 
-import com.opensymphony.xwork2.ActionSupport;
 import com.opensymphony.xwork2.Preparable;
 import com.suncorp.cashman.application.dto.NoteSupplyDTO;
 import com.suncorp.cashman.domain.CannotSupplyException;
@@ -16,10 +15,18 @@ import java.util.*;
  * @author jean.damore
  * @since 07-Apr-2011
  */
-public class CashMachineAction extends ActionSupport implements Preparable {
+public class CashMachineAction extends BaseAction implements Preparable {
 
     /** Instance to the CashMachine object. */
-    private CashMachine cashMachine = CashMachine.getInstance();
+    private CashMachine cashMachine;
+
+    public CashMachineAction() {
+        this.cashMachine = super.context.getBean(CashMachine.class);
+    }
+
+    public void setCashMachine(CashMachine cashMachine) {
+        this.cashMachine = cashMachine;
+    }
 
     /** The stock available in the CashMachine, as a list of DTOs. */
     private List<NoteSupplyDTO> stock = new ArrayList<NoteSupplyDTO>();

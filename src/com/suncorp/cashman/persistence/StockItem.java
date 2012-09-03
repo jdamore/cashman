@@ -13,8 +13,8 @@ import javax.persistence.*;
 public class StockItem {
 
     private Long id;
-    private Long value;
-    private Long quantity;
+    private Integer value;
+    private Integer quantity;
 
     @Id
     @GeneratedValue
@@ -28,20 +28,20 @@ public class StockItem {
     }
 
     @Column(name="VALUE")
-    public Long getValue() {
+    public Integer getValue() {
         return value;
     }
 
-    public void setValue(Long value) {
+    public void setValue(Integer value) {
         this.value = value;
     }
 
     @Column(name="QUANTITY")
-    public Long getQuantity() {
+    public Integer getQuantity() {
         return quantity;
     }
 
-    public void setQuantity(Long quantity) {
+    public void setQuantity(Integer quantity) {
         this.quantity = quantity;
     }
 
