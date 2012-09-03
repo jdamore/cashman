@@ -366,20 +366,21 @@
             <antcall target="itest-report" />
     </target>
 
-    <target name="itest-run" depends="compile-itest, copy-spring-config-itest, instrument">
+    <target name="itest-run" depends="compile-itest, copy-spring-config-itest">
          <mkdir dir="${cashman.doc}/intg"/>
          <junit fork="yes" dir="${cashman.cls}" printsummary="true" haltonfailure="false">
             <batchtest todir="${cashman.doc}/intg">
-                <fileset dir="${cashman.cls}" includes="test/**/iTest*.class" excludes="test/**/iTestBase.class"/>
+                <fileset dir="${cashman.cls}">
+                    <include name="test/**/iTest*.class" />
+                    <exclude name="test/**/iTestBase.class"/>
+                    <exclude name="test/**/iTestDAO.class"/>
+                </fileset>
                 <formatter type="xml"/>
             </batchtest>
             <classpath>
                 <path refid="cashman.lib.path" />
-                <pathelement location="${cashman.cls_i}" />
                 <path refid="cashman.cls.path" />
             </classpath>
-            <jvmarg value="-Demma.coverage.out.file=${basedir}/intg.emma" />
-            <jvmarg value="-Demma.coverage.out.merge=true" />
         </junit>
     </target>
 
@@ -388,18 +389,6 @@
             <fileset dir="${cashman.doc}/intg"/>
             <report todir="${cashman.doc}/intg"/>
         </junitreport>
-        <mkdir dir="${cashman.doc}/emma-junit"/>
-        <emma>
-            <report sourcepath="${cashman.src}" >
-                <fileset dir="${basedir}" >
-                    <include name="metadata.emma" />
-                    <include name="intg.emma" />
-                </fileset>
-                <xml outfile="${cashman.doc}/emma-intg/coverage.xml" />
-                <!--<txt outfile="${cashman.doc}/emma-intg/coverage.txt" />-->
-                <!--<html outfile="${cashman.doc}/emma-intg/coverage.html" />-->
-            </report>
-        </emma>
     </target>
 
 
