@@ -263,11 +263,6 @@
             <classpath refid="cashman.lib.path"/>
             <classpath refid="cashman.cls.path"/>
         </javac>
-        <copy toDir="${cashman.cls}" flatten="false">
-            <fileset dir="${cashman.utest}">
-                <include name="**/spring-fixtures-*.xml"/>
-            </fileset>
-        </copy>
     </target>
 
     <!--=================================================================== -->
@@ -282,6 +277,11 @@
             <classpath refid="cashman.lib.path"/>
             <classpath refid="cashman.cls.path"/>
         </javac>
+        <copy toDir="${cashman.cls}" flatten="false">
+            <fileset dir="${cashman.itest}">
+                <include name="*/**/spring-fixtures-*.xml"/>
+            </fileset>
+        </copy>
     </target>
 
     <!--=================================================================== -->

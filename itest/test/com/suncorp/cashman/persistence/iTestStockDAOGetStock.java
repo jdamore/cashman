@@ -9,8 +9,10 @@ import org.junit.runner.RunWith;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.transaction.BeforeTransaction;
 import org.springframework.test.context.transaction.TransactionConfiguration;
 import org.springframework.transaction.annotation.Transactional;
+import test.com.suncorp.cashman.iTestBase;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -24,13 +26,7 @@ import static junit.framework.Assert.*;
  * @since 22-Aug-2011
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations={"/config/test/spring-datasource.xml", "/config/test/spring-dao.xml", "/test/com/suncorp/cashman/persistence/spring-fixtures-stock-items.xml"})
-@TransactionConfiguration(transactionManager="txManager", defaultRollback=false)
-public class TestStockDAOGetStock {
-
-    /** Class under test. */
-    @Resource
-    private StockDAO stockDAO;
+public class iTestStockDAOGetStock extends iTestDAO {
 
     /** Fixtures. */
     @Resource
@@ -49,6 +45,12 @@ public class TestStockDAOGetStock {
     @Before
     @Transactional
     public void setup() {
+
+
+        deleteStock();
+        List<StockItem> stock = stockDAO.getStock();
+        assertEquals(0, stock.size());
+
         assertNotNull(stockDAO);
         assertNotNull(stockItem$50);
         assertNotNull(stockItem$20);
@@ -62,11 +64,15 @@ public class TestStockDAOGetStock {
         assertTrue(stockItem$50.getId()>0);
         assertTrue(stockItem$20.getId()>0);
         assertTrue(stockItem$10.getId()>0);
+
+        stock = stockDAO.getStock();
+        assertEquals(3, stock.size());
     }
 
     @After
     @Transactional
     public void tearDown() {
+
         if(stockDAO.getStockItem(stockItem$50.getId())!=null) stockDAO.deleteStockItem(stockItem$50);
         if(stockDAO.getStockItem(stockItem$20.getId())!=null) stockDAO.deleteStockItem(stockItem$20);
         if(stockDAO.getStockItem(stockItem$10.getId())!=null) stockDAO.deleteStockItem(stockItem$10);
@@ -78,6 +84,7 @@ public class TestStockDAOGetStock {
 
     @Test
     public void testGetStockWhenStockPresentReturnsExpectedList() {
+
         List<StockItem> stock = stockDAO.getStock();
         assertNotNull(stock);
         assertEquals(3, stock.size());

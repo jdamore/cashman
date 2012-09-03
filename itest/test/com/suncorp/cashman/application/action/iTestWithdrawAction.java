@@ -7,25 +7,34 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.transaction.TransactionConfiguration;
+import org.springframework.transaction.annotation.Transactional;
 import test.com.suncorp.cashman.iTestBase;
 
 import static junit.framework.Assert.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
+
+@TransactionConfiguration(transactionManager="txManager", defaultRollback=true)
 public class iTestWithdrawAction extends iTestBase {
 
     private CashMachineAction cashMachineAction;
 
     @Before
+    @Transactional
     public void setup() {
         cashMachineAction = new CashMachineAction();
     }
 
     @After
-    public void tearDown() {}
+    public void tearDown() {
+
+    }
 
     @Test
+    @Transactional
     public void testWithdraw() {
         cashMachineAction.setWithdrawalAmount(500);
         assertEquals(com.opensymphony.xwork2.Action.SUCCESS, cashMachineAction.withdraw());

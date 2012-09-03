@@ -12,6 +12,7 @@ import org.springframework.test.context.transaction.AfterTransaction;
 import org.springframework.test.context.transaction.BeforeTransaction;
 import org.springframework.test.context.transaction.TransactionConfiguration;
 import org.springframework.transaction.annotation.Transactional;
+import test.com.suncorp.cashman.iTestBase;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
@@ -27,14 +28,8 @@ import static junit.framework.Assert.assertEquals;
  * @since 22-Aug-2011
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations={"/config/test/spring-datasource.xml", "/config/test/spring-dao.xml",   "/test/com/suncorp/cashman/persistence/spring-fixtures-stock-items.xml"})
-@TransactionConfiguration(transactionManager="txManager", defaultRollback=false)
 @Transactional
-public class TestStockDAOSaveStock {
-
-    /** Class under test. */
-    @Resource
-    private StockDAO stockDAO;
+public class iTestStockDAOSaveStock  extends iTestDAO {
 
     /** Fixtures. */
     @Resource
@@ -49,12 +44,6 @@ public class TestStockDAOSaveStock {
      * Setup and tearDown methods
      * ****************************************************
      */
-
-    @BeforeTransaction
-    public void setupBeforeTransaction() {
-        assertNotNull(stockDAO);
-        deleteStock();
-    }
 
     @Before
     public void setup() {
@@ -73,8 +62,7 @@ public class TestStockDAOSaveStock {
 
     @AfterTransaction
     public void tearDownAfterTransaction() {
-        deleteStock();
-        assertEquals(0, stockDAO.getStock().size());
+        super.tearDownAfterTransaction();
         stockItem$50.setId(null);
         stockItem$20.setId(null);
         stockItem$10.setId(null);
@@ -113,14 +101,6 @@ public class TestStockDAOSaveStock {
         stockDAO.saveStock(stock);
         assertEquals(1, stock.size());
         assertEquals(newQuantity, (int)stock.get(0).getQuantity());
-    }
-
-
-    private void deleteStock() {
-        for(StockItem stockItem : stockDAO.getStock()) {
-            stockDAO.deleteStockItem(stockItem);
-            stockItem.setId(null);
-        }
     }
 
     private List<StockItem> createStockList(StockItem... stockItems) {
