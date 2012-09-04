@@ -27,12 +27,6 @@
         <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
     </listener>
 
-    <!--<listener>-->
-      <!--<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>-->
-   <!--</listener>-->
-   <!--<context-param>-->
-      <!--<param-name>contextConfigLocation</param-name>-->
-      <!--<param-value>classpath:/config/dev/spring-cashmachine.xml, classpath:/config/dev/spring-dao.xml, classpath:/config/dev/spring-datasource.xml</param-value>-->
-   <!--</context-param>-->
+
 
 </web-app>

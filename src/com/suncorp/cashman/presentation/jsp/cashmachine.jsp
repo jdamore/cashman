@@ -1,6 +1,7 @@
 <%@ page import="java.util.Properties" %>
 <%@ page import="java.io.FileInputStream" %>
 <%@ page import="java.io.IOException" %>
+<%@ page import="org.apache.jasper.JasperException" %>
 <%@ taglib prefix="s" uri="/WEB-INF/lib/tld/struts-tags.tld" %>
 <%@ page contentType="text/html; charset=UTF-8"%>
 <link href="<%=request.getContextPath()%>/css/cashmachine.css" rel="stylesheet" type="text/css">
@@ -15,7 +16,7 @@
         properties.load(Thread.currentThread().getContextClassLoader().getResourceAsStream("build.properties"));
         buildID = properties.getProperty("build.id");
     }
-    catch (IOException e) {
+    catch (Exception e) {
         buildID = "ERROR reading build.properties";
         errorMessage = e.getMessage();
     }

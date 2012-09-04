@@ -63,6 +63,7 @@
         <antcall target="build" />
         <antcall target="utest" />
         <antcall target="itest" />
+        <!--<antcall target="ftest" />-->
         <antcall target="javadoc" />
     </target>
 
@@ -80,13 +81,28 @@
     <!-- =================================================================== -->
     <!-- Dist Target                                                         -->
     <!-- =================================================================== -->
+    <target name="ftest-dist">
+        <antcall target="copy-web-config" />
+        <antcall target="copy-struts-config" />
+        <antcall target="copy-spring-config" />
+        <antcall target="copy-tlds" />
+        <antcall target="copy-jsp" />
+        <antcall target="copy-css" />
+        <antcall target="copy-jetty-startup" />
+    </target>
+
+    <!-- =================================================================== -->
+    <!-- Dist Target                                                         -->
+    <!-- =================================================================== -->
     <target name="dist" description="Main Build Target">
         <antcall target="copy-web-config" />
         <antcall target="copy-struts-config" />
         <antcall target="copy-spring-config" />
         <antcall target="copy-lib" />
+        <antcall target="copy-tlds" />
         <antcall target="copy-jsp" />
         <antcall target="copy-css" />
+        <antcall target="copy-jetty-startup" />
         <antcall target="package" />
     </target>
 
@@ -151,7 +167,7 @@
     <!-- =================================================================== -->
     <!-- Copy Spring config files for integration testing to classpath       -->
     <!-- =================================================================== -->
-    <target name="copy-spring-config-itest" depends="prepare">
+    <target name="itest-copy-spring-config" depends="prepare">
         <copy toDir="${cashman.cls}" flatten="true">
             <fileset dir="${cashman.home}">
                 <include name="config/test/spring-*.xml"/>
@@ -173,6 +189,10 @@
                 <exclude name="selenium/*" />
             </fileset>
         </copy>
+    </target>
+
+
+    <target name="copy-tlds" depends="prepare">
         <copy toDir="${cashman.dist}/cashman/WEB-INF/lib/tld" flatten="true">
             <fileset dir="${cashman.lib}">
                 <include name="**/*.tld"/>
@@ -195,6 +215,18 @@
             </fileset>
         </copy>
     </target>
+
+    <!-- =================================================================== -->
+    <!-- Copy Embedded Jetty server startup script                           -->
+    <!-- =================================================================== -->
+    <target name="copy-jetty-startup" depends="prepare">
+        <copy toDir="${cashman.dist}" flatten="true">
+            <fileset dir="${cashman.src}">
+                <include name="**/start-jetty-server.sh"/>
+            </fileset>
+        </copy>
+    </target>
+
 
     <!-- =================================================================== -->
     <!-- Copy CSSs to distribution                                           -->
@@ -254,7 +286,7 @@
     <!--=================================================================== -->
     <!-- Compile Unit Tests                                                 -->
     <!--=================================================================== -->
-    <target name="compile-utest" depends="compile, copy-spring-config">
+    <target name="utest-compile" depends="compile, copy-spring-config">
         <javac srcdir="${cashman.utest}"
             destdir="${cashman.cls}"
             debug="on"
@@ -268,7 +300,7 @@
     <!--=================================================================== -->
     <!-- Compile Intg Tests                                                 -->
     <!--=================================================================== -->
-    <target name="compile-itest" depends="compile">
+    <target name="itest-compile" depends="compile">
         <javac srcdir="${cashman.itest}"
             destdir="${cashman.cls}"
             debug="on"
@@ -287,7 +319,7 @@
     <!--=================================================================== -->
     <!-- Compile Jbehave Tests                                                 -->
     <!--=================================================================== -->
-    <target name="compile-ftest" depends="compile, copy-stories">
+    <target name="ftest-compile" depends="compile, copy-stories">
         <javac srcdir="${cashman.ftest}"
             destdir="${cashman.cls}"
             debug="on"
@@ -317,13 +349,15 @@
     <!-- Execute Unit Tests with Tomcat running against instrumented classes  -->
     <!-- Create Unit Tests and Emma code coverage reports                   -->
     <!--=================================================================== -->
-    <target name="utest" description="Run Unit Tests"
-            depends="utest-run, utest-report" />
+    <target name="utest" description="Run Unit Tests">
+            <antcall target="utest-run" />
+            <antcall target="utest-report" />
+    </target>
 
-    <target name="utest-run" depends="compile-utest, instrument">
-         <mkdir dir="${cashman.doc}/junit"/>
+    <target name="utest-run" depends="utest-compile, instrument">
+         <mkdir dir="${cashman.doc}/utest"/>
          <junit fork="yes" dir="${cashman.cls}" printsummary="true" haltonfailure="false">
-            <batchtest todir="${cashman.doc}/junit">
+            <batchtest todir="${cashman.doc}/utest">
                 <fileset dir="${cashman.cls}" includes="test/**/Test*.class" />
                 <formatter type="xml"/>
             </batchtest>
@@ -338,9 +372,9 @@
     </target>
 
     <target name="utest-report">
-        <junitreport todir="${cashman.doc}/junit">
-            <fileset dir="${cashman.doc}/junit"/>
-            <report todir="${cashman.doc}/junit"/>
+        <junitreport todir="${cashman.doc}/utest">
+            <fileset dir="${cashman.doc}/utest"/>
+            <report todir="${cashman.doc}/utest"/>
         </junitreport>
         <mkdir dir="${cashman.doc}/emma-junit"/>
         <emma>
@@ -366,10 +400,10 @@
             <antcall target="itest-report" />
     </target>
 
-    <target name="itest-run" depends="compile-itest, copy-spring-config-itest">
-         <mkdir dir="${cashman.doc}/intg"/>
+    <target name="itest-run" depends="itest-compile, itest-copy-spring-config">
+         <mkdir dir="${cashman.doc}/itest"/>
          <junit fork="yes" dir="${cashman.cls}" printsummary="true" haltonfailure="false">
-            <batchtest todir="${cashman.doc}/intg">
+            <batchtest todir="${cashman.doc}/itest">
                 <fileset dir="${cashman.cls}">
                     <include name="test/**/iTest*.class" />
                     <exclude name="test/**/iTestBase.class"/>
@@ -385,9 +419,9 @@
     </target>
 
     <target name="itest-report">
-        <junitreport todir="${cashman.doc}/intg">
-            <fileset dir="${cashman.doc}/intg"/>
-            <report todir="${cashman.doc}/intg"/>
+        <junitreport todir="${cashman.doc}/itest">
+            <fileset dir="${cashman.doc}/itest"/>
+            <report todir="${cashman.doc}/itest"/>
         </junitreport>
     </target>
 
@@ -395,79 +429,40 @@
     <!--=================================================================== -->
     <!-- Run JUnit JBehave Tests                                            -->
     <!--=================================================================== -->
-    <target name="ftest" description="Run JUnit JBehave Tests "
-            depends="ftest-run, ftest-report" />
+    <target name="ftest" description="Run JUnit JBehave Tests">
+        <antcall target="ftest-run"/>
+        <antcall target="ftest-report" />
+    </target>
 
-    <target name="ftest-run" depends="compile-ftest">
+    <target name="ftest-prepare">
+        <antcall target="ftest-compile"/>
+        <antcall target="ftest-dist" />
 
-        <mkdir dir="${cashman.dist}/classes_temp" />
-        <copy todir="${cashman.dist}/classes_temp">
-            <fileset dir="${cashman.cls}" >
-                <include name="**/*.class" />
-                <include name="**/*.story" />
-            </fileset>
-        </copy>
-        <delete>
-            <fileset dir="${cashman.cls}" includes="**/*.class">
-                    <exclude name="stories/**/*Story.class"/>
-                    <exclude name="stories/**/*.story"/>
-            </fileset>
-        </delete>
-        <copy todir="${cashman.cls}">
-            <fileset dir="${cashman.cls_i}" >
-                <include name="**/*.class" />
-            </fileset>
-        </copy>
-        <!--<antcall target="tomcat-start" />-->
-        <!--<sleep milliseconds="3000"/>-->
-        <mkdir dir="${cashman.doc}/jbehave"/>
+    </target>
+
+
+    <target name="ftest-run" depends="ftest-prepare">
+        <mkdir dir="${cashman.doc}/ftest"/>
         <junit fork="yes" printsummary="true" haltonfailure="false">
-            <!--<batchtest todir="${cashman.doc}/jbehave">-->
-                <!--<fileset dir="${cashman.dist}/classes_temp" includes="stories/**/*Story.class" />-->
-                <!--<formatter type="xml"/>-->
-            <!--</batchtest>-->
             <batchtest>
-                <fileset dir="${cashman.dist}/classes_temp" includes="stories/**/*Story.class" />
+                <fileset dir="${cashman.cls}" includes="stories/**/*Story.class" />
             </batchtest>
+            <formatter type="xml"/>
             <classpath>
                 <path refid="cashman.lib.path" />
-                <pathelement location="${cashman.dist}/classes_temp" />
+                <path refid="cashman.cls.path" />
             </classpath>
-            <jvmarg value="-Demma.coverage.out.file=${basedir}/jbehave.emma" />
-            <jvmarg value="-Demma.coverage.out.merge=true" />
         </junit>
-        <!--<antcall target="tomcat-stop" />-->
-        <delete>
-            <fileset dir="${cashman.cls}" includes="**/*.class"/>
-        </delete>
-        <copy todir="${cashman.cls}">
-            <fileset dir="${cashman.dist}/classes_temp" >
-                <include name="**/*.class" />
-            </fileset>
-        </copy>
-        <delete dir="${cashman.dist}/classes_temp"/>
     </target>
 
     <target name="ftest-report">
-        <mkdir dir="${cashman.doc}/jbehave"/>
-        <junitreport todir="${cashman.doc}/jbehave">
-            <fileset dir="${cashman.doc}/jbehave"/>
-            <report todir="${cashman.doc}/jbehave"/>
-        </junitreport>
-        <delete>
-            <fileset dir="${cashman.doc}/jbehave" includes="*.xml" />
-        </delete>
-        <mkdir dir="${cashman.doc}/emma-jbehave"/>
-        <emma>
-            <report sourcepath="${cashman.src}" >
-                <fileset dir="${basedir}" >
-                    <include name="metadata.emma" />
-                    <include name="jbehave.emma" />
-                </fileset>
-                <txt outfile="${cashman.doc}/emma-jbehave/coverage.txt" />
-                <html outfile="${cashman.doc}/emma-jbehave/coverage.html" />
-            </report>
-        </emma>
+        <mkdir dir="${cashman.doc}/ftest"/>
+        <copy todir="${cashman.doc}/ftest">
+            <fileset dir="${cashman.dist}/cashman/WEB-INF/jbehave" >
+                <include name="**/*"/>
+            </fileset>
+        </copy>
+        <delete dir="${cashman.dist}/cashman/WEB-INF/jbehave" />
     </target>
 
     <!--=================================================================== -->
@@ -489,6 +484,26 @@
         </java>
     </target>
 
+
+    <!--=================================================================== -->
+    <!-- Start/Stop embedded jJtty server                                   -->
+    <!--=================================================================== -->
+    <target name="jetty-start" depends="copy-jetty-startup">
+        <exec executable="/bin/bash" spawn="false">
+            <arg value="${cashman.dist}/start-jetty-server.sh"/>
+        </exec>
+    </target>
+
+    <target name="jetty-stop">
+        <exec executable="/bin/bash" spawn="true">
+            <arg value="${cashman.dist}/stop-jetty-server.sh"/>
+        </exec>
+    </target>
+
+
+    <!--=================================================================== -->
+    <!-- Start/Stop local Tomcat server                                   -->
+    <!--=================================================================== -->
     <target name="tomcat-stop">
         <exec executable="/bin/bash">
             <arg value="${tomcat.home}/bin/shutdown.sh"/>

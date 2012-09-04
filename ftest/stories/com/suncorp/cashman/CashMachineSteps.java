@@ -1,5 +1,7 @@
 package stories.com.suncorp.cashman;
 
+import com.gargoylesoftware.htmlunit.BrowserVersion;
+import com.suncorp.cashman.infrastructure.jetty.JettyServer;
 import com.thoughtworks.selenium.DefaultSelenium;
 import com.thoughtworks.selenium.Selenium;
 import org.jbehave.core.annotations.Aliases;
@@ -21,17 +23,37 @@ import static junit.framework.Assert.fail;
 
 public class CashMachineSteps {
 
+    private static HtmlUnitDriver driver;
+
     static
     {
-        System.setProperty("webdriver.chrome.driver", "/Users/jdamore/dev/projects/java/cashman/lib/selenium/chromedriver");
+//        System.setProperty("webdriver.chrome.driver", "/Users/jdamore/dev/projects/java/cashman/lib/selenium/chromedriver");
+        driver =  new HtmlUnitDriver(BrowserVersion.FIREFOX_3);
+        driver.setJavascriptEnabled(true);
     }
 
-    private WebDriver driver = new HtmlUnitDriver();
+//    private WebDriver driver = new HtmlUnitDriver();
+
+    @Given("The web server is started")
+    public void startServer() throws Exception {
+        JettyServer.getInstance().start();
+    }
+
+    @Given("I wait for $seconds seconds")
+    public void wait(int seconds) throws InterruptedException {
+        Thread.sleep(seconds*1000);
+    }
+
+    @Then("The web server is stopped")
+    public void stopServer() throws Exception {
+        JettyServer.getInstance().stop();
+    }
 
 
     @Given("I go to the Cash Machine Home page")
     public void goToHome() {
-        driver.get("http://localhost:8080/cashman");
+
+        driver.get("http://localhost:"+JettyServer.PORT+"/cashman/index.jsp");
     }
 
     @When("I ask for amount $amount")

@@ -1,4 +1,4 @@
-package com.suncorp.cashman.infrastructure;
+package com.suncorp.cashman.infrastructure.spring;
 
 public final class SpringAppContext {
 

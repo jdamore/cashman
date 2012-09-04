@@ -19,18 +19,29 @@ import org.jbehave.core.steps.InjectableStepsFactory;
 import org.jbehave.core.steps.InstanceStepsFactory;
 import org.jbehave.core.steps.ParameterConverters;
 
-import javax.swing.text.html.HTML;
 import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Properties;
 
 public class CashMachineStory extends JUnitStory {
 
+    private final CrossReference xref = new CrossReference();
+
+
     @Override
     public Configuration configuration() {
+        Class<? extends Embeddable> embeddableClass = this.getClass();
+         Properties viewResources = new Properties();
+        viewResources.put("decorateNonHtml", "true");
         return new MostUsefulConfiguration()
             .useStoryLoader(new LoadFromClasspath(this.getClass()))
-            .useStoryReporterBuilder(new StoryReporterBuilder().withDefaultFormats().withFormats(Format.CONSOLE, Format.TXT, Format.HTML));
+            .useStoryReporterBuilder(
+                        new StoryReporterBuilder()
+                                .withCodeLocation(CodeLocations.codeLocationFromClass(embeddableClass))
+                                .withDefaultFormats().withPathResolver(new FilePrintStreamFactory.ResolveToPackagedName())
+                                .withViewResources(viewResources).withFormats(Format.CONSOLE, Format.TXT, Format.HTML, Format.XML)
+                                .withFailureTrace(true).withFailureTraceCompression(true).withCrossReference(xref))
+                .useStepMonitor(xref.getStepMonitor());
     }
 
     @Override
