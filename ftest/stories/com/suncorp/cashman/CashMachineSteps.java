@@ -32,8 +32,6 @@ public class CashMachineSteps {
         driver.setJavascriptEnabled(true);
     }
 
-//    private WebDriver driver = new HtmlUnitDriver();
-
     @Given("The web server is started")
     public void startServer() throws Exception {
         JettyServer.getInstance().start();

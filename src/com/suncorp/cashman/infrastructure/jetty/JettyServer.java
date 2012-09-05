@@ -27,7 +27,9 @@ public class JettyServer {
     }
 
     public void start() throws Exception {
+        System.out.println("Will start server");
         this.server.start();
+        System.out.println("Server started");
     }
 
     public void stop() throws Exception {
@@ -39,7 +41,7 @@ public class JettyServer {
         webApp.setResourceBase(getDistributionPath());
         webApp.setDescriptor("web.xml");
         webApp.setContextPath("/cashman");
-//        webApp.setParentLoaderPriority(true);
+        webApp.setParentLoaderPriority(true);
         return webApp;
     }
 
@@ -67,24 +69,3 @@ public class JettyServer {
     }
 
 }
-
-
-
-
-
-
-
-
-
-//        Server server = new Server();
-//        Connector connector = new SelectChannelConnector();
-//        connector.setPort (PORT);
-//        connector.setHost ("127.0.0.1");
-//        server.addConnector (connector);
-//        WebAppContext context = new WebAppContext();
-//        context.setResourceBase("dist/cashman");
-//        context.setDescriptor("web.xml");
-//        context.setContextPath("/cashman");
-//        server.setHandler(context);
-//        server.start();
-//        server.join();

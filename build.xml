@@ -434,14 +434,7 @@
         <antcall target="ftest-report" />
     </target>
 
-    <target name="ftest-prepare">
-        <antcall target="ftest-compile"/>
-        <antcall target="ftest-dist" />
-
-    </target>
-
-
-    <target name="ftest-run" depends="ftest-prepare">
+    <target name="ftest-run" depends="ftest-compile, ftest-dist">
         <mkdir dir="${cashman.doc}/ftest"/>
         <junit fork="yes" printsummary="true" haltonfailure="false">
             <batchtest>
@@ -489,9 +482,15 @@
     <!-- Start/Stop embedded jJtty server                                   -->
     <!--=================================================================== -->
     <target name="jetty-start" depends="copy-jetty-startup">
-        <exec executable="/bin/bash" spawn="false">
-            <arg value="${cashman.dist}/start-jetty-server.sh"/>
-        </exec>
+        <!--<exec executable="/bin/bash" spawn="false">-->
+            <!--<arg value="${cashman.dist}/start-jetty-server.sh"/>-->
+        <!--</exec>-->
+        <java classname="com.suncorp.cashman.infrastructure.jetty.JettyServer" fork="true">
+            <classpath>
+                <path refid="cashman.lib.path" />
+                <path refid="cashman.cls.path" />
+            </classpath>
+        </java>
     </target>
 
     <target name="jetty-stop">
