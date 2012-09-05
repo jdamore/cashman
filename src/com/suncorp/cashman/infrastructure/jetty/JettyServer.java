@@ -41,7 +41,7 @@ public class JettyServer {
         webApp.setResourceBase(getDistributionPath());
         webApp.setDescriptor("web.xml");
         webApp.setContextPath("/cashman");
-        webApp.setParentLoaderPriority(true);
+//        webApp.setParentLoaderPriority(true);
         return webApp;
     }
 
