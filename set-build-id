@@ -1,0 +1,2 @@
+#!/bin/sh
+echo build.id=$1 >> build.properties
