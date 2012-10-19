@@ -1,2 +1,2 @@
 #!/bin/sh
-echo build.id=$1 >> build.properties
+echo build.id=$1 >> ./build.properties
