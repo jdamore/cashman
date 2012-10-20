@@ -1,0 +1,21 @@
+#!/bin/sh
+HTTP_RESPONSE=./http_response.html
+curl $1 > $HTTP_RESPONSE 
+if [ $? -gt 0 ]; then
+	echo "Could not curl $1"
+	exit 3
+fi
+grep -w "HTTP Status 404" $HTTP_RESPONSE >/dev/null
+if [ $? -eq 0 ]; then
+   echo "Received a 404"
+   cat $HTTP_RESPONSE
+   exit 2
+fi
+grep -w $GO_DEPENDENCY_LABEL_CASHMACHINECI $HTTP_RESPONSE >/dev/null
+if [ $? -ne 0 ]; then
+   echo "Cannot find $GO_DEPENDENCY_LABEL_CASHMACHINECI in the HTTP response"
+   cat $HTTP_RESPONSE
+   exit 1
+fi
+rm -f $HTTP_RESPONSE
+exit 0
