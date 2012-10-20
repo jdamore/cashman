@@ -27,7 +27,7 @@
 
     <table width="60%" border="0" style="color:#aaaaaa;font-size:10pt;"><tr><td align="right"><%=buildID + " " + errorMessage%></td></tr></table>
 
-    <h1 class="title">Cash Machine</h1>
+    <h1 class="title">Cash Machine Test Application</h1>
     <table width="250" border="0" cellpadding="0" cellspacing="2">
         <tr>
             <td width="200">Note Type</td>
