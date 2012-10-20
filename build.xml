@@ -191,7 +191,9 @@
         </copy>
     </target>
 
-
+    <!-- =================================================================== -->
+    <!-- Copy Struts Tag Libraries to distribution                           -->
+    <!-- =================================================================== -->
     <target name="copy-tlds" depends="prepare">
         <copy toDir="${cashman.dist}/cashman/WEB-INF/lib/tld" flatten="true">
             <fileset dir="${cashman.lib}">
@@ -254,9 +256,9 @@
     <!-- Create cashman.war                                                  -->
     <!-- =================================================================== -->
     <target name="package" depends="prepare">
-        <echo message="Will create archive ${build.id}_cashman.war" />
+        <echo message="Will create archive cashman-${build.id}.war" />
         <echo file="${cashman.cls}/build.properties">build.id=${build.id}</echo>
-         <jar destfile="${cashman.dist}/${build.id}_cashman.war"
+         <jar destfile="${cashman.dist}/cashman-${build.id}.war"
              basedir="${cashman.dist}/cashman"
              includes="**/*">
         </jar>
@@ -470,7 +472,6 @@
             <jvmarg value="-Djava.util.logging.config.file=${tomcat.home}/conf/logging.properties" />
             <jvmarg value="-Dcatalina.home=${tomcat.home}" />
             <jvmarg value="-Dcatalina.base=${tomcat.home}" />
-            <!--<jvmarg value="-Djava.io.tmpdir=${tomcat.home}/temp" />-->
             <jvmarg value="-Demma.coverage.out.file=${basedir}/selenium.emma" />
             <jvmarg value="-Demma.coverage.out.merge=true" />
             <arg line="start" />
