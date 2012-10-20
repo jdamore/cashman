@@ -1,0 +1,2 @@
+#!/bin/sh
+echo build.id=$GO_PIPELINE_LABEL >> ./build.properties
