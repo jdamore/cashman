@@ -1,6 +1,6 @@
 #!/bin/sh
 echo "Will deploy cashman to $1 using credentials $2/$3"
-cp pkg/cashman-*.war dist/cashman.war
+cp pkg/cashman-$GO_DEPENDENCY_LABEL_CASHMACHINECI.war dist/cashman.war
 curl --upload-file dist/cashman.war "http://$2:$3@$1/manager/deploy?path=/cashman&update=true"
 res=$?
 rm -f dist/cashman.war
