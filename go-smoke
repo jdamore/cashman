@@ -11,9 +11,9 @@ if [ $? -eq 0 ]; then
    cat $HTTP_RESPONSE
    exit 2
 fi
-grep -w $GO_DEPENDENCY_LABEL_CASHMACHINECI $HTTP_RESPONSE >/dev/null
+grep -w $GO_DEPENDENCY_LABEL_CASHMACHINERC $HTTP_RESPONSE >/dev/null
 if [ $? -ne 0 ]; then
-   echo "Cannot find $GO_DEPENDENCY_LABEL_CASHMACHINECI in the HTTP response"
+   echo "Cannot find $GO_DEPENDENCY_LABEL_CASHMACHINERC in the HTTP response"
    cat $HTTP_RESPONSE
    exit 1
 fi
